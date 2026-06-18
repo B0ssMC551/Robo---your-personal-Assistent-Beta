@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>ROBO Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- =========================================================
+         START-SCREEN — DOWNLOAD / WEB-VERSION
+         ========================================================= -->
+    <div id="start-screen">
+        <main>
+            <div class="card big">
+                <h2 data-i18n="start.title">ROBO Control</h2>
+                <p data-i18n="start.subtitle">
+                    Steuerzentrale für deinen ROBO – als App oder im Browser.
+                </p>
+
+                <div class="home-actions">
+                    <button class="btn primary" id="btn-start-install" data-i18n="start.install">
+                        App installieren
+                    </button>
+                    <button class="btn secondary" id="btn-start-web" data-i18n="start.web">
+                        Weiter zur Web-Version
+                    </button>
+                </div>
+
+                <p style="margin-top:14px;font-size:13px;color:#555;" data-i18n="start.tip">
+                    Tipp: Installiere die App für schnelleres Öffnen und Offline-Funktionen.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================================================
+         ONBOARDING — IMMER
+         ========================================================= -->
+    <div id="onboarding">
+        <!-- STEP 1: Sprache -->
+        <div class="onb-step" data-step="1">
+            <h1 data-i18n="onb.lang.title">Sprache auswählen</h1>
+            <p data-i18n="onb.lang.text">Wähle die Sprache, in der ROBO mit dir spricht.</p>
+
+            <select id="onb-language">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="tr">Türkçe</option>
+                <option value="ru">Русский</option>
+                <option value="pl">Polski</option>
+            </select>
+
+            <div class="onb-actions">
+                <button class="btn ghost" id="onb-cancel-1" data-i18n="onb.cancel">Abbrechen</button>
+                <button class="btn primary" id="onb-next-1" data-i18n="onb.next">Weiter</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Wakeword -->
+        <div class="onb-step" data-step="2">
+            <h1 data-i18n="onb.wake.title">Wakeword festlegen</h1>
+            <p data-i18n="onb.wake.text">Wie soll dein ROBO aktiviert werden?</p>
+
+            <input id="onb-wakeword" type="text" placeholder="z.B. 'Hey ROBO'" />
+
+            <div class="onb-actions">
+                <button class="btn secondary" id="onb-back-2" data-i18n="onb.back">Zurück</button>
+                <button class="btn primary" id="onb-next-2" data-i18n="onb.next">Weiter</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Gerät koppeln -->
+        <div class="onb-step" data-step="3">
+            <h1 data-i18n="onb.pair.title">Gerät koppeln</h1>
+            <p data-i18n="onb.pair.text">Gib den Koppel-Code deines ROBO ein.</p>
+
+            <input id="onb-pair-code" type="text" placeholder="z.B. 6-stelliger Code" />
+
+            <div class="onb-actions">
+                <button class="btn secondary" id="onb-back-3" data-i18n="onb.back">Zurück</button>
+                <button class="btn primary" id="onb-finish" data-i18n="onb.finish">Fertig</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         APP WRAPPER
+         ========================================================= -->
+    <div id="app">
+        <!-- TOP NAVIGATION -->
+        <header id="topnav">
+            <div class="nav-left">
+                <div class="logo-dot"></div>
+                <div class="logo-text" data-i18n="nav.appName">ROBO Control</div>
+            </div>
+            <div class="nav-right">
+                <button data-page="home" class="active" data-i18n="nav.home">Home</button>
+                <button data-page="lighting" data-i18n="nav.lighting">Beleuchtung</button>
+                <button data-page="settings" data-i18n="nav.settings">Einstellungen</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- =====================================================
+                 PAGE: HOME
+                 ===================================================== -->
+            <section id="page-home" class="page">
+                <div class="home-header">
+                    <h1 data-i18n="home.title">Dein ROBO</h1>
+                    <p data-i18n="home.subtitle">Steuerzentrale für deinen persönlichen Assistenten.</p>
+                </div>
+
+                <!-- STATUS CARD -->
+                <div class="card big">
+                    <h2 data-i18n="home.status.title">Status</h2>
+                    <p id="home-language-text">Sprache: –</p>
+                    <p id="home-wakeword-text">Wakeword: –</p>
+                    <p id="home-pair-text">Gekoppeltes Gerät: Nicht gekoppelt</p>
+                </div>
+
+                <!-- ACTION CARDS – etwas klarer geordnet -->
+                <div class="home-actions">
+                    <div class="card">
+                        <h3 data-i18n="home.pair.title">Gerät koppeln</h3>
+                        <p data-i18n="home.pair.text">Verbinde ROBO mit dieser Steuerzentrale.</p>
+                        <button class="btn primary" id="btn-pair-open" data-i18n="home.pair.button">
+                            Gerät koppeln
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3 data-i18n="home.onb.title">Onboarding neu starten</h3>
+                        <p data-i18n="home.onb.text">Sprache, Wakeword und Koppel-Code neu einrichten.</p>
+                        <button class="btn secondary" id="btn-restart-onboarding" data-i18n="home.onb.button">
+                            Neu einrichten
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <h3 data-i18n="home.install.title">App-Hinweis</h3>
+                        <p data-i18n="home.install.text">
+                            Installiere ROBO Control als App für ein besseres Erlebnis.
+                        </p>
+                        <button class="btn ghost" id="btn-show-install-hint" data-i18n="home.install.button">
+                            Installations-Hinweis anzeigen
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =====================================================
+                 PAGE: LIGHTING / RGB
+                 ===================================================== -->
+            <section id="page-lighting" class="page">
+                <div class="card big">
+                    <h2 data-i18n="light.title">LED & Beleuchtung</h2>
+                    <p data-i18n="light.subtitle">Steuere die LED-Ringe und Farben deines ROBO.</p>
+
+                    <!-- PRESETS -->
+                    <div class="rgb-presets">
+                        <button class="preset" data-preset="calm" data-i18n="light.preset.calm">Calm Blue</button>
+                        <button class="preset" data-preset="focus" data-i18n="light.preset.focus">Focus White</button>
+                        <button class="preset" data-preset="party" data-i18n="light.preset.party">Party RGB</button>
+                        <button class="preset" data-preset="sleep" data-i18n="light.preset.sleep">Sleep Mode</button>
+                    </div>
+
+                    <!-- RGB ROWS -->
+                    <div class="rgb-row">
+                        <div class="rgb-col">
+                            <label>
+                                <input type="checkbox" id="rgb-inner-enabled" checked />
+                                <span data-i18n="light.inner">Innerer Ring</span>
+                            </label>
+                            <input type="color" id="rgb-inner-color" value="#0a84ff" />
+                            <div class="quick-colors" data-target="rgb-inner-color">
+                                <span style="background:#0a84ff;"></span>
+                                <span style="background:#34c759;"></span>
+                                <span style="background:#ffcc00;"></span>
+                                <span style="background:#ff3b30;"></span>
+                            </div>
+                        </div>
+
+                        <div class="rgb-col">
+                            <label>
+                                <input type="checkbox" id="rgb-middle-enabled" checked />
+                                <span data-i18n="light.middle">Mittlerer Ring</span>
+                            </label>
+                            <input type="color" id="rgb-middle-color" value="#34c759" />
+                            <div class="quick-colors" data-target="rgb-middle-color">
+                                <span style="background:#0a84ff;"></span>
+                                <span style="background:#34c759;"></span>
+                                <span style="background:#ffcc00;"></span>
+                                <span style="background:#ff3b30;"></span>
+                            </div>
+                        </div>
+
+                        <div class="rgb-col">
+                            <label>
+                                <input type="checkbox" id="rgb-outer-enabled" checked />
+                                <span data-i18n="light.outer">Äußerer Ring</span>
+                            </label>
+                            <input type="color" id="rgb-outer-color" value="#ffcc00" />
+                            <div class="quick-colors" data-target="rgb-outer-color">
+                                <span style="background:#0a84ff;"></span>
+                                <span style="background:#34c759;"></span>
+                                <span style="background:#ffcc00;"></span>
+                                <span style="background:#ff3b30;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PREVIEW -->
+                    <div id="rgbPreview" data-i18n="light.preview">
+                        Vorschau deiner aktuellen LED-Einstellungen
+                    </div>
+
+                    <button class="btn primary" id="btn-save-rgb" style="margin-top:14px;" data-i18n="light.save">
+                        Einstellungen speichern
+                    </button>
+                    <div class="save-message" id="rgb-save-message" style="display:none;" data-i18n="light.saved">
+                        Gespeichert! ROBO übernimmt die neuen Farben.
+                    </div>
+                </div>
+            </section>
+
+            <!-- =====================================================
+                 PAGE: SETTINGS
+                 ===================================================== -->
+            <section id="page-settings" class="page">
+                <div class="card big">
+                    <h2 data-i18n="settings.title">Einstellungen</h2>
+
+                    <div class="setting-row">
+                        <span data-i18n="settings.language">Aktuelle Sprache</span>
+                        <span id="settings-language-label">–</span>
+                    </div>
+
+                    <div class="setting-row">
+                        <span data-i18n="settings.wakeword">Wakeword</span>
+                        <span id="settings-wakeword-label">–</span>
+                    </div>
+
+                    <div class="setting-row">
+                        <span data-i18n="settings.pair">Gekoppeltes Gerät</span>
+                        <span id="settings-pair-label">Nicht gekoppelt</span>
+                    </div>
+
+                    <div class="setting-row">
+                        <span data-i18n="settings.ledAnimation">LED-Animation</span>
+                        <label class="switch">
+                            <input type="checkbox" id="settings-led-animation" checked />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <span data-i18n="settings.notifications">Benachrichtigungen</span>
+                        <label class="switch">
+                            <input type="checkbox" id="settings-notifications" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 data-i18n="settings.onb.title">Onboarding erneut durchlaufen</h3>
+                    <p data-i18n="settings.onb.text">Sprache, Wakeword und Koppel-Code neu einrichten.</p>
+                    <button class="btn secondary" id="btn-restart-onboarding-settings" data-i18n="settings.onb.button">
+                        Onboarding starten
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- =========================================================
+         GERÄT-KOPPELN MODAL
+         ========================================================= -->
+    <div id="pair-modal" class="hidden">
+        <div class="card big" style="max-width:420px;margin:80px auto;">
+            <h2 data-i18n="modal.pair.title">Gerät koppeln</h2>
+            <p data-i18n="modal.pair.text">Gib den Koppel-Code deines ROBO ein.</p>
+
+            <input id="pair-modal-code" type="text" placeholder="z.B. 6-stelliger Code" />
+
+            <div class="onb-actions">
+                <button class="btn ghost" id="pair-modal-cancel" data-i18n="modal.cancel">Abbrechen</button>
+                <button class="btn primary" id="pair-modal-confirm" data-i18n="modal.confirm">Koppeln</button>
+            </div>
+
+            <p id="pair-modal-error" style="margin-top:8px;font-size:13px;color:#ff3b30;display:none;"
+               data-i18n="modal.error">
+                Ungültiger Code. Bitte erneut versuchen.
+            </p>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         SCRIPTS
+         ========================================================= -->
+    <script>
+        // =========================
+        // TRANSLATIONS
+        // =========================
+        const translations = {
+            de: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Steuerzentrale für deinen ROBO – als App oder im Browser.",
+                "start.install": "App installieren",
+                "start.web": "Weiter zur Web-Version",
+                "start.tip": "Tipp: Installiere die App für schnelleres Öffnen und Offline-Funktionen.",
+
+                "onb.lang.title": "Sprache auswählen",
+                "onb.lang.text": "Wähle die Sprache, in der ROBO mit dir spricht.",
+                "onb.wake.title": "Wakeword festlegen",
+                "onb.wake.text": "Wie soll dein ROBO aktiviert werden?",
+                "onb.pair.title": "Gerät koppeln",
+                "onb.pair.text": "Gib den Koppel-Code deines ROBO ein.",
+                "onb.cancel": "Abbrechen",
+                "onb.next": "Weiter",
+                "onb.back": "Zurück",
+                "onb.finish": "Fertig",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Home",
+                "nav.lighting": "Beleuchtung",
+                "nav.settings": "Einstellungen",
+
+                "home.title": "Dein ROBO",
+                "home.subtitle": "Steuerzentrale für deinen persönlichen Assistenten.",
+                "home.status.title": "Status",
+                "home.pair.title": "Gerät koppeln",
+                "home.pair.text": "Verbinde ROBO mit dieser Steuerzentrale.",
+                "home.pair.button": "Gerät koppeln",
+                "home.onb.title": "Onboarding neu starten",
+                "home.onb.text": "Sprache, Wakeword und Koppel-Code neu einrichten.",
+                "home.onb.button": "Neu einrichten",
+                "home.install.title": "App-Hinweis",
+                "home.install.text": "Installiere ROBO Control als App für ein besseres Erlebnis.",
+                "home.install.button": "Installations-Hinweis anzeigen",
+
+                "light.title": "LED & Beleuchtung",
+                "light.subtitle": "Steuere die LED-Ringe und Farben deines ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Innerer Ring",
+                "light.middle": "Mittlerer Ring",
+                "light.outer": "Äußerer Ring",
+                "light.preview": "Vorschau deiner aktuellen LED-Einstellungen",
+                "light.save": "Einstellungen speichern",
+                "light.saved": "Gespeichert! ROBO übernimmt die neuen Farben.",
+
+                "settings.title": "Einstellungen",
+                "settings.language": "Aktuelle Sprache",
+                "settings.wakeword": "Wakeword",
+                "settings.pair": "Gekoppeltes Gerät",
+                "settings.ledAnimation": "LED-Animation",
+                "settings.notifications": "Benachrichtigungen",
+                "settings.onb.title": "Onboarding erneut durchlaufen",
+                "settings.onb.text": "Sprache, Wakeword und Koppel-Code neu einrichten.",
+                "settings.onb.button": "Onboarding starten",
+
+                "modal.pair.title": "Gerät koppeln",
+                "modal.pair.text": "Gib den Koppel-Code deines ROBO ein.",
+                "modal.cancel": "Abbrechen",
+                "modal.confirm": "Koppeln",
+                "modal.error": "Ungültiger Code. Bitte erneut versuchen.",
+
+                "status.language": "Sprache",
+                "status.wakeword": "Wakeword",
+                "status.paired": "Gekoppeltes Gerät",
+                "status.notPaired": "Nicht gekoppelt",
+                "status.pairCode": "Code"
+            },
+            en: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Control center for your ROBO – as app or in the browser.",
+                "start.install": "Install app",
+                "start.web": "Continue to web version",
+                "start.tip": "Tip: Install the app for faster access and offline features.",
+
+                "onb.lang.title": "Choose language",
+                "onb.lang.text": "Select the language ROBO should use.",
+                "onb.wake.title": "Set wake word",
+                "onb.wake.text": "How should your ROBO be activated?",
+                "onb.pair.title": "Pair device",
+                "onb.pair.text": "Enter the pairing code of your ROBO.",
+                "onb.cancel": "Cancel",
+                "onb.next": "Next",
+                "onb.back": "Back",
+                "onb.finish": "Finish",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Home",
+                "nav.lighting": "Lighting",
+                "nav.settings": "Settings",
+
+                "home.title": "Your ROBO",
+                "home.subtitle": "Control center for your personal assistant.",
+                "home.status.title": "Status",
+                "home.pair.title": "Pair device",
+                "home.pair.text": "Connect ROBO with this control center.",
+                "home.pair.button": "Pair device",
+                "home.onb.title": "Restart onboarding",
+                "home.onb.text": "Reconfigure language, wake word and pairing code.",
+                "home.onb.button": "Reconfigure",
+                "home.install.title": "App hint",
+                "home.install.text": "Install ROBO Control as an app for a better experience.",
+                "home.install.button": "Show install hint",
+
+                "light.title": "LED & lighting",
+                "light.subtitle": "Control the LED rings and colors of your ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Inner ring",
+                "light.middle": "Middle ring",
+                "light.outer": "Outer ring",
+                "light.preview": "Preview of your current LED settings",
+                "light.save": "Save settings",
+                "light.saved": "Saved! ROBO applies the new colors.",
+
+                "settings.title": "Settings",
+                "settings.language": "Current language",
+                "settings.wakeword": "Wake word",
+                "settings.pair": "Paired device",
+                "settings.ledAnimation": "LED animation",
+                "settings.notifications": "Notifications",
+                "settings.onb.title": "Run onboarding again",
+                "settings.onb.text": "Reconfigure language, wake word and pairing code.",
+                "settings.onb.button": "Start onboarding",
+
+                "modal.pair.title": "Pair device",
+                "modal.pair.text": "Enter the pairing code of your ROBO.",
+                "modal.cancel": "Cancel",
+                "modal.confirm": "Pair",
+                "modal.error": "Invalid code. Please try again.",
+
+                "status.language": "Language",
+                "status.wakeword": "Wake word",
+                "status.paired": "Paired device",
+                "status.notPaired": "Not paired",
+                "status.pairCode": "Code"
+            },
+            es: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Centro de control para tu ROBO, como app o en el navegador.",
+                "start.install": "Instalar app",
+                "start.web": "Continuar en versión web",
+                "start.tip": "Consejo: instala la app para abrir más rápido y usar funciones sin conexión.",
+
+                "onb.lang.title": "Seleccionar idioma",
+                "onb.lang.text": "Elige el idioma en el que ROBO hablará contigo.",
+                "onb.wake.title": "Configurar palabra de activación",
+                "onb.wake.text": "¿Cómo se debe activar tu ROBO?",
+                "onb.pair.title": "Vincular dispositivo",
+                "onb.pair.text": "Introduce el código de vinculación de tu ROBO.",
+                "onb.cancel": "Cancelar",
+                "onb.next": "Siguiente",
+                "onb.back": "Atrás",
+                "onb.finish": "Finalizar",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Inicio",
+                "nav.lighting": "Iluminación",
+                "nav.settings": "Ajustes",
+
+                "home.title": "Tu ROBO",
+                "home.subtitle": "Centro de control para tu asistente personal.",
+                "home.status.title": "Estado",
+                "home.pair.title": "Vincular dispositivo",
+                "home.pair.text": "Conecta ROBO con este centro de control.",
+                "home.pair.button": "Vincular dispositivo",
+                "home.onb.title": "Reiniciar onboarding",
+                "home.onb.text": "Configura de nuevo idioma, palabra de activación y código.",
+                "home.onb.button": "Reconfigurar",
+                "home.install.title": "Aviso de app",
+                "home.install.text": "Instala ROBO Control como app para una mejor experiencia.",
+                "home.install.button": "Mostrar aviso de instalación",
+
+                "light.title": "LED e iluminación",
+                "light.subtitle": "Controla los anillos LED y colores de tu ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Anillo interior",
+                "light.middle": "Anillo medio",
+                "light.outer": "Anillo exterior",
+                "light.preview": "Vista previa de la configuración LED actual",
+                "light.save": "Guardar ajustes",
+                "light.saved": "¡Guardado! ROBO aplica los nuevos colores.",
+
+                "settings.title": "Ajustes",
+                "settings.language": "Idioma actual",
+                "settings.wakeword": "Palabra de activación",
+                "settings.pair": "Dispositivo vinculado",
+                "settings.ledAnimation": "Animación LED",
+                "settings.notifications": "Notificaciones",
+                "settings.onb.title": "Repetir onboarding",
+                "settings.onb.text": "Configura de nuevo idioma, palabra de activación y código.",
+                "settings.onb.button": "Iniciar onboarding",
+
+                "modal.pair.title": "Vincular dispositivo",
+                "modal.pair.text": "Introduce el código de vinculación de tu ROBO.",
+                "modal.cancel": "Cancelar",
+                "modal.confirm": "Vincular",
+                "modal.error": "Código no válido. Inténtalo de nuevo.",
+
+                "status.language": "Idioma",
+                "status.wakeword": "Palabra de activación",
+                "status.paired": "Dispositivo vinculado",
+                "status.notPaired": "No vinculado",
+                "status.pairCode": "Código"
+            },
+            fr: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Centre de contrôle pour ton ROBO, en app ou dans le navigateur.",
+                "start.install": "Installer l’app",
+                "start.web": "Continuer vers la version web",
+                "start.tip": "Astuce : installe l’app pour un accès plus rapide et des fonctions hors ligne.",
+
+                "onb.lang.title": "Choisir la langue",
+                "onb.lang.text": "Choisis la langue dans laquelle ROBO te parle.",
+                "onb.wake.title": "Définir le mot d’activation",
+                "onb.wake.text": "Comment ton ROBO doit-il être activé ?",
+                "onb.pair.title": "Appairer l’appareil",
+                "onb.pair.text": "Entre le code d’appairage de ton ROBO.",
+                "onb.cancel": "Annuler",
+                "onb.next": "Suivant",
+                "onb.back": "Retour",
+                "onb.finish": "Terminer",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Accueil",
+                "nav.lighting": "Éclairage",
+                "nav.settings": "Réglages",
+
+                "home.title": "Ton ROBO",
+                "home.subtitle": "Centre de contrôle pour ton assistant personnel.",
+                "home.status.title": "Statut",
+                "home.pair.title": "Appairer l’appareil",
+                "home.pair.text": "Connecte ROBO à ce centre de contrôle.",
+                "home.pair.button": "Appairer l’appareil",
+                "home.onb.title": "Relancer l’onboarding",
+                "home.onb.text": "Reconfigurer la langue, le mot d’activation et le code.",
+                "home.onb.button": "Reconfigurer",
+                "home.install.title": "Conseil app",
+                "home.install.text": "Installe ROBO Control comme app pour une meilleure expérience.",
+                "home.install.button": "Afficher le conseil d’installation",
+
+                "light.title": "LED & éclairage",
+                "light.subtitle": "Contrôle les anneaux LED et les couleurs de ton ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Anneau intérieur",
+                "light.middle": "Anneau central",
+                "light.outer": "Anneau extérieur",
+                "light.preview": "Aperçu de la configuration LED actuelle",
+                "light.save": "Enregistrer les réglages",
+                "light.saved": "Enregistré ! ROBO applique les nouvelles couleurs.",
+
+                "settings.title": "Réglages",
+                "settings.language": "Langue actuelle",
+                "settings.wakeword": "Mot d’activation",
+                "settings.pair": "Appareil appairé",
+                "settings.ledAnimation": "Animation LED",
+                "settings.notifications": "Notifications",
+                "settings.onb.title": "Relancer l’onboarding",
+                "settings.onb.text": "Reconfigurer la langue, le mot d’activation et le code.",
+                "settings.onb.button": "Démarrer l’onboarding",
+
+                "modal.pair.title": "Appairer l’appareil",
+                "modal.pair.text": "Entre le code d’appairage de ton ROBO.",
+                "modal.cancel": "Annuler",
+                "modal.confirm": "Appairer",
+                "modal.error": "Code invalide. Réessaie.",
+
+                "status.language": "Langue",
+                "status.wakeword": "Mot d’activation",
+                "status.paired": "Appareil appairé",
+                "status.notPaired": "Non appairé",
+                "status.pairCode": "Code"
+            },
+            it: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Centro di controllo per il tuo ROBO, come app o nel browser.",
+                "start.install": "Installa app",
+                "start.web": "Continua alla versione web",
+                "start.tip": "Suggerimento: installa l’app per un accesso più rapido e funzioni offline.",
+
+                "onb.lang.title": "Seleziona la lingua",
+                "onb.lang.text": "Scegli la lingua in cui ROBO parlerà con te.",
+                "onb.wake.title": "Imposta la parola di attivazione",
+                "onb.wake.text": "Come deve essere attivato il tuo ROBO?",
+                "onb.pair.title": "Associa dispositivo",
+                "onb.pair.text": "Inserisci il codice di associazione del tuo ROBO.",
+                "onb.cancel": "Annulla",
+                "onb.next": "Avanti",
+                "onb.back": "Indietro",
+                "onb.finish": "Fine",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Home",
+                "nav.lighting": "Illuminazione",
+                "nav.settings": "Impostazioni",
+
+                "home.title": "Il tuo ROBO",
+                "home.subtitle": "Centro di controllo per il tuo assistente personale.",
+                "home.status.title": "Stato",
+                "home.pair.title": "Associa dispositivo",
+                "home.pair.text": "Collega ROBO a questo centro di controllo.",
+                "home.pair.button": "Associa dispositivo",
+                "home.onb.title": "Riavvia onboarding",
+                "home.onb.text": "Configura di nuovo lingua, parola di attivazione e codice.",
+                "home.onb.button": "Riconfigura",
+                "home.install.title": "Suggerimento app",
+                "home.install.text": "Installa ROBO Control come app per una migliore esperienza.",
+                "home.install.button": "Mostra suggerimento installazione",
+
+                "light.title": "LED e illuminazione",
+                "light.subtitle": "Controlla gli anelli LED e i colori del tuo ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Anello interno",
+                "light.middle": "Anello centrale",
+                "light.outer": "Anello esterno",
+                "light.preview": "Anteprima delle impostazioni LED correnti",
+                "light.save": "Salva impostazioni",
+                "light.saved": "Salvato! ROBO applica i nuovi colori.",
+
+                "settings.title": "Impostazioni",
+                "settings.language": "Lingua attuale",
+                "settings.wakeword": "Parola di attivazione",
+                "settings.pair": "Dispositivo associato",
+                "settings.ledAnimation": "Animazione LED",
+                "settings.notifications": "Notifiche",
+                "settings.onb.title": "Ripeti onboarding",
+                "settings.onb.text": "Configura di nuovo lingua, parola di attivazione e codice.",
+                "settings.onb.button": "Avvia onboarding",
+
+                "modal.pair.title": "Associa dispositivo",
+                "modal.pair.text": "Inserisci il codice di associazione del tuo ROBO.",
+                "modal.cancel": "Annulla",
+                "modal.confirm": "Associa",
+                "modal.error": "Codice non valido. Riprova.",
+
+                "status.language": "Lingua",
+                "status.wakeword": "Parola di attivazione",
+                "status.paired": "Dispositivo associato",
+                "status.notPaired": "Non associato",
+                "status.pairCode": "Codice"
+            },
+            tr: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "ROBO’n için kontrol merkezi – uygulama veya tarayıcıda.",
+                "start.install": "Uygulamayı yükle",
+                "start.web": "Web sürümüne devam et",
+                "start.tip": "İpucu: Daha hızlı açılış ve çevrimdışı özellikler için uygulamayı yükle.",
+
+                "onb.lang.title": "Dil seç",
+                "onb.lang.text": "ROBO’nun hangi dilde konuşacağını seç.",
+                "onb.wake.title": "Uyanma kelimesi ayarla",
+                "onb.wake.text": "ROBO nasıl aktif olsun?",
+                "onb.pair.title": "Cihaz eşleştir",
+                "onb.pair.text": "ROBO’nun eşleştirme kodunu gir.",
+                "onb.cancel": "İptal",
+                "onb.next": "İleri",
+                "onb.back": "Geri",
+                "onb.finish": "Bitir",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Ana sayfa",
+                "nav.lighting": "Aydınlatma",
+                "nav.settings": "Ayarlar",
+
+                "home.title": "ROBO’n",
+                "home.subtitle": "Kişisel asistanın için kontrol merkezi.",
+                "home.status.title": "Durum",
+                "home.pair.title": "Cihaz eşleştir",
+                "home.pair.text": "ROBO’yu bu kontrol merkeziyle bağla.",
+                "home.pair.button": "Cihaz eşleştir",
+                "home.onb.title": "Onboarding’i yeniden başlat",
+                "home.onb.text": "Dil, uyanma kelimesi ve kodu yeniden ayarla.",
+                "home.onb.button": "Yeniden yapılandır",
+                "home.install.title": "Uygulama önerisi",
+                "home.install.text": "Daha iyi bir deneyim için ROBO Control’ü uygulama olarak yükle.",
+                "home.install.button": "Yükleme önerisini göster",
+
+                "light.title": "LED ve aydınlatma",
+                "light.subtitle": "ROBO’nun LED halkalarını ve renklerini kontrol et.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "İç halka",
+                "light.middle": "Orta halka",
+                "light.outer": "Dış halka",
+                "light.preview": "Geçerli LED ayarlarının önizlemesi",
+                "light.save": "Ayarları kaydet",
+                "light.saved": "Kaydedildi! ROBO yeni renkleri uygular.",
+
+                "settings.title": "Ayarlar",
+                "settings.language": "Geçerli dil",
+                "settings.wakeword": "Uyanma kelimesi",
+                "settings.pair": "Eşleştirilmiş cihaz",
+                "settings.ledAnimation": "LED animasyonu",
+                "settings.notifications": "Bildirimler",
+                "settings.onb.title": "Onboarding’i tekrar çalıştır",
+                "settings.onb.text": "Dil, uyanma kelimesi ve kodu yeniden ayarla.",
+                "settings.onb.button": "Onboarding’i başlat",
+
+                "modal.pair.title": "Cihaz eşleştir",
+                "modal.pair.text": "ROBO’nun eşleştirme kodunu gir.",
+                "modal.cancel": "İptal",
+                "modal.confirm": "Eşleştir",
+                "modal.error": "Geçersiz kod. Lütfen tekrar dene.",
+
+                "status.language": "Dil",
+                "status.wakeword": "Uyanma kelimesi",
+                "status.paired": "Eşleştirilmiş cihaz",
+                "status.notPaired": "Eşleştirilmedi",
+                "status.pairCode": "Kod"
+            },
+            ru: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Центр управления твоим ROBO — как приложение или в браузере.",
+                "start.install": "Установить приложение",
+                "start.web": "Перейти к веб-версии",
+                "start.tip": "Совет: установи приложение для быстрого запуска и офлайн-функций.",
+
+                "onb.lang.title": "Выбор языка",
+                "onb.lang.text": "Выбери язык, на котором ROBO будет с тобой говорить.",
+                "onb.wake.title": "Задать ключевое слово",
+                "onb.wake.text": "Как должен активироваться твой ROBO?",
+                "onb.pair.title": "Подключить устройство",
+                "onb.pair.text": "Введи код подключения твоего ROBO.",
+                "onb.cancel": "Отмена",
+                "onb.next": "Далее",
+                "onb.back": "Назад",
+                "onb.finish": "Готово",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Главная",
+                "nav.lighting": "Подсветка",
+                "nav.settings": "Настройки",
+
+                "home.title": "Твой ROBO",
+                "home.subtitle": "Центр управления твоим персональным ассистентом.",
+                "home.status.title": "Статус",
+                "home.pair.title": "Подключить устройство",
+                "home.pair.text": "Подключи ROBO к этому центру управления.",
+                "home.pair.button": "Подключить устройство",
+                "home.onb.title": "Перезапустить onboarding",
+                "home.onb.text": "Заново настроить язык, ключевое слово и код.",
+                "home.onb.button": "Перенастроить",
+                "home.install.title": "Подсказка по приложению",
+                "home.install.text": "Установи ROBO Control как приложение для лучшего опыта.",
+                "home.install.button": "Показать подсказку установки",
+
+                "light.title": "LED и подсветка",
+                "light.subtitle": "Управляй LED-кольцами и цветами твоего ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Внутреннее кольцо",
+                "light.middle": "Среднее кольцо",
+                "light.outer": "Внешнее кольцо",
+                "light.preview": "Предпросмотр текущих настроек подсветки",
+                "light.save": "Сохранить настройки",
+                "light.saved": "Сохранено! ROBO применит новые цвета.",
+
+                "settings.title": "Настройки",
+                "settings.language": "Текущий язык",
+                "settings.wakeword": "Ключевое слово",
+                "settings.pair": "Подключённое устройство",
+                "settings.ledAnimation": "LED-анимация",
+                "settings.notifications": "Уведомления",
+                "settings.onb.title": "Повторить onboarding",
+                "settings.onb.text": "Заново настроить язык, ключевое слово и код.",
+                "settings.onb.button": "Запустить onboarding",
+
+                "modal.pair.title": "Подключить устройство",
+                "modal.pair.text": "Введи код подключения твоего ROBO.",
+                "modal.cancel": "Отмена",
+                "modal.confirm": "Подключить",
+                "modal.error": "Неверный код. Попробуй ещё раз.",
+
+                "status.language": "Язык",
+                "status.wakeword": "Ключевое слово",
+                "status.paired": "Подключённое устройство",
+                "status.notPaired": "Не подключено",
+                "status.pairCode": "Код"
+            },
+            pl: {
+                "start.title": "ROBO Control",
+                "start.subtitle": "Centrum sterowania twoim ROBO – jako aplikacja lub w przeglądarce.",
+                "start.install": "Zainstaluj aplikację",
+                "start.web": "Przejdź do wersji web",
+                "start.tip": "Wskazówka: zainstaluj aplikację, aby szybciej uruchamiać i korzystać offline.",
+
+                "onb.lang.title": "Wybierz język",
+                "onb.lang.text": "Wybierz język, w którym ROBO ma z tobą rozmawiać.",
+                "onb.wake.title": "Ustaw słowo wybudzające",
+                "onb.wake.text": "Jak ma być aktywowany twój ROBO?",
+                "onb.pair.title": "Sparuj urządzenie",
+                "onb.pair.text": "Wpisz kod parowania twojego ROBO.",
+                "onb.cancel": "Anuluj",
+                "onb.next": "Dalej",
+                "onb.back": "Wstecz",
+                "onb.finish": "Zakończ",
+
+                "nav.appName": "ROBO Control",
+                "nav.home": "Strona główna",
+                "nav.lighting": "Oświetlenie",
+                "nav.settings": "Ustawienia",
+
+                "home.title": "Twój ROBO",
+                "home.subtitle": "Centrum sterowania twoim osobistym asystentem.",
+                "home.status.title": "Status",
+                "home.pair.title": "Sparuj urządzenie",
+                "home.pair.text": "Połącz ROBO z tym centrum sterowania.",
+                "home.pair.button": "Sparuj urządzenie",
+                "home.onb.title": "Uruchom onboarding ponownie",
+                "home.onb.text": "Skonfiguruj ponownie język, słowo wybudzające i kod.",
+                "home.onb.button": "Skonfiguruj ponownie",
+                "home.install.title": "Wskazówka o aplikacji",
+                "home.install.text": "Zainstaluj ROBO Control jako aplikację dla lepszego doświadczenia.",
+                "home.install.button": "Pokaż wskazówkę instalacji",
+
+                "light.title": "LED i oświetlenie",
+                "light.subtitle": "Steruj pierścieniami LED i kolorami twojego ROBO.",
+                "light.preset.calm": "Calm Blue",
+                "light.preset.focus": "Focus White",
+                "light.preset.party": "Party RGB",
+                "light.preset.sleep": "Sleep Mode",
+                "light.inner": "Pierścień wewnętrzny",
+                "light.middle": "Pierścień środkowy",
+                "light.outer": "Pierścień zewnętrzny",
+                "light.preview": "Podgląd aktualnych ustawień LED",
+                "light.save": "Zapisz ustawienia",
+                "light.saved": "Zapisano! ROBO zastosuje nowe kolory.",
+
+                "settings.title": "Ustawienia",
+                "settings.language": "Aktualny język",
+                "settings.wakeword": "Słowo wybudzające",
+                "settings.pair": "Sparowane urządzenie",
+                "settings.ledAnimation": "Animacja LED",
+                "settings.notifications": "Powiadomienia",
+                "settings.onb.title": "Uruchom onboarding ponownie",
+                "settings.onb.text": "Skonfiguruj ponownie język, słowo wybudzające i kod.",
+                "settings.onb.button": "Uruchom onboarding",
+
+                "modal.pair.title": "Sparuj urządzenie",
+                "modal.pair.text": "Wpisz kod parowania twojego ROBO.",
+                "modal.cancel": "Anuluj",
+                "modal.confirm": "Sparuj",
+                "modal.error": "Nieprawidłowy kod. Spróbuj ponownie.",
+
+                "status.language": "Język",
+                "status.wakeword": "Słowo wybudzające",
+                "status.paired": "Sparowane urządzenie",
+                "status.notPaired": "Brak sparowania",
+                "status.pairCode": "Kod"
+            }
+        };
+
+        let currentLang = localStorage.getItem("robo_language") || "de";
+
+        function applyTranslations(lang) {
+            const t = translations[lang] || translations["de"];
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.dataset.i18n;
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+        }
+
+        function getLanguageLabel(code) {
+            switch (code) {
+                case "de": return "Deutsch";
+                case "en": return "English";
+                case "es": return "Español";
+                case "fr": return "Français";
+                case "it": return "Italiano";
+                case "tr": return "Türkçe";
+                case "ru": return "Русский";
+                case "pl": return "Polski";
+                default: return code || "Unbekannt";
+            }
+        }
+
+        // =========================
+        // GLOBAL STATE
+        // =========================
+        let deferredInstallPrompt = null;
+
+        const startScreen = document.getElementById("start-screen");
+        const onboarding = document.getElementById("onboarding");
+        const app = document.getElementById("app");
+
+        const btnStartInstall = document.getElementById("btn-start-install");
+        const btnStartWeb = document.getElementById("btn-start-web");
+
+        // =========================
+        // INSTALL / START-SCREEN
+        // =========================
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+        });
+
+        btnStartInstall.addEventListener("click", async () => {
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                await deferredInstallPrompt.userChoice;
+                deferredInstallPrompt = null;
+            } else {
+                alert("Zum Installieren bitte im Browser-Menü 'Zum Startbildschirm hinzufügen' wählen.");
+            }
+        });
+
+        btnStartWeb.addEventListener("click", () => {
+            startScreen.style.display = "none";
+            startOnboarding();
+        });
+
+        // =========================
+        // ONBOARDING
+        // =========================
+        const onbSteps = document.querySelectorAll(".onb-step");
+        const onbLanguage = document.getElementById("onb-language");
+        const onbNext1 = document.getElementById("onb-next-1");
+        const onbCancel1 = document.getElementById("onb-cancel-1");
+        const onbWakeword = document.getElementById("onb-wakeword");
+        const onbNext2 = document.getElementById("onb-next-2");
+        const onbBack2 = document.getElementById("onb-back-2");
+        const onbPairCode = document.getElementById("onb-pair-code");
+        const onbBack3 = document.getElementById("onb-back-3");
+        const onbFinish = document.getElementById("onb-finish");
+
+        function showOnbStep(step) {
+            onbSteps.forEach(s => {
+                s.style.display = s.dataset.step === String(step) ? "block" : "none";
+            });
+        }
+
+        function startOnboarding() {
+            onboarding.style.display = "block";
+            app.style.display = "none";
+
+            const savedLang = localStorage.getItem("robo_language") || "de";
+            onbLanguage.value = savedLang;
+            onbWakeword.value = localStorage.getItem("robo_wakeword") || "Hey ROBO";
+            onbPairCode.value = localStorage.getItem("robo_pair_code") || "";
+
+            applyTranslations(savedLang);
+            showOnbStep(1);
+        }
+
+        // Step 1
+        onbNext1.addEventListener("click", () => {
+            const lang = onbLanguage.value || "de";
+            localStorage.setItem("robo_language", lang);
+            applyTranslations(lang);
+            showOnbStep(2);
+        });
+
+        onbCancel1.addEventListener("click", () => {
+            onboarding.style.display = "none";
+            startScreen.style.display = "block";
+        });
+
+        // Step 2
+        onbBack2.addEventListener("click", () => {
+            showOnbStep(1);
+        });
+
+        onbNext2.addEventListener("click", () => {
+            const wake = onbWakeword.value.trim() || "Hey ROBO";
+            localStorage.setItem("robo_wakeword", wake);
+            showOnbStep(3);
+        });
+
+        // Step 3
+        onbBack3.addEventListener("click", () => {
+            showOnbStep(2);
+        });
+
+        onbFinish.addEventListener("click", () => {
+            const code = onbPairCode.value.trim();
+            if (!code) {
+                alert("Bitte einen Koppel-Code eingeben.");
+                return;
+            }
+            localStorage.setItem("robo_pair_code", code);
+            localStorage.setItem("robo_paired", "true");
+
+            onboarding.style.display = "none";
+            app.style.display = "block";
+            updateUIFromStorage();
+        });
+
+        // =========================
+        // NAVIGATION
+        // =========================
+        const navButtons = document.querySelectorAll("#topnav .nav-right button");
+        const pages = document.querySelectorAll(".page");
+
+        function showPage(pageId) {
+            pages.forEach(p => {
+                p.style.display = p.id === `page-${pageId}` ? "block" : "none";
+            });
+            navButtons.forEach(b => {
+                b.classList.toggle("active", b.dataset.page === pageId);
+            });
+        }
+
+        navButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                showPage(btn.dataset.page);
+            });
+        });
+
+        // =========================
+        // STATUS LABELS
+        // =========================
+        const homeLanguageText = document.getElementById("home-language-text");
+        const homeWakewordText = document.getElementById("home-wakeword-text");
+        const homePairText = document.getElementById("home-pair-text");
+        const settingsLanguageLabel = document.getElementById("settings-language-label");
+        const settingsWakewordLabel = document.getElementById("settings-wakeword-label");
+        const settingsPairLabel = document.getElementById("settings-pair-label");
+
+        function updateUIFromStorage() {
+            const lang = localStorage.getItem("robo_language") || "de";
+            const t = translations[lang] || translations["de"];
+
+            const wake = localStorage.getItem("robo_wakeword") || "Hey ROBO";
+            const paired = localStorage.getItem("robo_paired") === "true";
+            const pairCode = localStorage.getItem("robo_pair_code") || "–";
+
+            const langLabel = getLanguageLabel(lang);
+
+            homeLanguageText.textContent = `${t["status.language"]}: ${langLabel}`;
+            homeWakewordText.textContent = `${t["status.wakeword"]}: ${wake}`;
+            homePairText.textContent = paired
+                ? `${t["status.paired"]}: ${t["status.pairCode"]} ${pairCode}`
+                : `${t["status.paired"]}: ${t["status.notPaired"]}`;
+
+            settingsLanguageLabel.textContent = langLabel;
+            settingsWakewordLabel.textContent = wake;
+            settingsPairLabel.textContent = paired
+                ? `${t["status.paired"]} (${t["status.pairCode"]}: ${pairCode})`
+                : t["status.notPaired"];
+
+            applyTranslations(lang);
+        }
+
+        // =========================
+        // GERÄT-KOPPELN MODAL
+        // =========================
+        const pairModal = document.getElementById("pair-modal");
+        const pairModalCode = document.getElementById("pair-modal-code");
+        const pairModalCancel = document.getElementById("pair-modal-cancel");
+        const pairModalConfirm = document.getElementById("pair-modal-confirm");
+        const pairModalError = document.getElementById("pair-modal-error");
+        const btnPairOpen = document.getElementById("btn-pair-open");
+
+        btnPairOpen.addEventListener("click", () => {
+            pairModal.classList.remove("hidden");
+            pairModalCode.value = "";
+            pairModalError.style.display = "none";
+        });
+
+        pairModalCancel.addEventListener("click", () => {
+            pairModal.classList.add("hidden");
+        });
+
+        pairModalConfirm.addEventListener("click", () => {
+            const code = pairModalCode.value.trim();
+            if (!code || code.length < 4) {
+                pairModalError.style.display = "block";
+                return;
+            }
+            localStorage.setItem("robo_pair_code", code);
+            localStorage.setItem("robo_paired", "true");
+            pairModal.classList.add("hidden");
+            updateUIFromStorage();
+        });
+
+        // =========================
+        // ONBOARDING NEU STARTEN
+        // =========================
+        const btnRestartOnboarding = document.getElementById("btn-restart-onboarding");
+        const btnRestartOnboardingSettings = document.getElementById("btn-restart-onboarding-settings");
+
+        function restartOnboardingFlow() {
+            startScreen.style.display = "none";
+            startOnboarding();
+        }
+
+        btnRestartOnboarding.addEventListener("click", restartOnboardingFlow);
+        btnRestartOnboardingSettings.addEventListener("click", restartOnboardingFlow);
+
+        // =========================
+        // INSTALL-HINWEIS
+        // =========================
+        const btnShowInstallHint = document.getElementById("btn-show-install-hint");
+        btnShowInstallHint.addEventListener("click", () => {
+            alert("Zum Installieren: Im Browser-Menü 'Zum Startbildschirm hinzufügen' wählen.");
+        });
+
+        // =========================
+        // RGB / LIGHTING LOGIK
+        // =========================
+        const rgbInnerEnabled = document.getElementById("rgb-inner-enabled");
+        const rgbMiddleEnabled = document.getElementById("rgb-middle-enabled");
+        const rgbOuterEnabled = document.getElementById("rgb-outer-enabled");
+        const rgbInnerColor = document.getElementById("rgb-inner-color");
+        const rgbMiddleColor = document.getElementById("rgb-middle-color");
+        const rgbOuterColor = document.getElementById("rgb-outer-color");
+        const rgbPreview = document.getElementById("rgbPreview");
+        const rgbSaveMessage = document.getElementById("rgb-save-message");
+        const btnSaveRgb = document.getElementById("btn-save-rgb");
+        const rgbPresets = document.querySelectorAll(".preset");
+        const quickColorGroups = document.querySelectorAll(".quick-colors");
+
+        function updateRgbPreview() {
+            const parts = [];
+            if (rgbInnerEnabled.checked) parts.push(rgbInnerColor.value);
+            if (rgbMiddleEnabled.checked) parts.push(rgbMiddleColor.value);
+            if (rgbOuterEnabled.checked) parts.push(rgbOuterColor.value);
+
+            const lang = localStorage.getItem("robo_language") || "de";
+            const t = translations[lang] || translations["de"];
+
+            if (parts.length === 0) {
+                rgbPreview.style.background = "#111";
+                rgbPreview.textContent = t["light.preview"];
+            } else if (parts.length === 1) {
+                rgbPreview.style.background = parts[0];
+                rgbPreview.textContent = t["light.preview"];
+            } else {
+                rgbPreview.style.background = `linear-gradient(90deg, ${parts.join(", ")})`;
+                rgbPreview.textContent = t["light.preview"];
+            }
+        }
+
+        [rgbInnerEnabled, rgbMiddleEnabled, rgbOuterEnabled,
+         rgbInnerColor, rgbMiddleColor, rgbOuterColor].forEach(el => {
+            el.addEventListener("input", updateRgbPreview);
+        });
+
+        quickColorGroups.forEach(group => {
+            const targetId = group.getAttribute("data-target");
+            const targetInput = document.getElementById(targetId);
+            group.querySelectorAll("span").forEach(span => {
+                span.addEventListener("click", () => {
+                    const color = window.getComputedStyle(span).backgroundColor;
+                    targetInput.value = rgbToHex(color);
+                    updateRgbPreview();
+                });
+            });
+        });
+
+        function rgbToHex(rgb) {
+            const m = rgb.match(/\d+/g);
+            if (!m) return "#ffffff";
+            const [r, g, b] = m.map(Number);
+            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("");
+        }
+
+        rgbPresets.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const preset = btn.dataset.preset;
+                if (preset === "calm") {
+                    rgbInnerColor.value = "#0a84ff";
+                    rgbMiddleColor.value = "#34c759";
+                    rgbOuterColor.value = "#0a84ff";
+                } else if (preset === "focus") {
+                    rgbInnerColor.value = "#ffffff";
+                    rgbMiddleColor.value = "#ffffff";
+                    rgbOuterColor.value = "#ffffff";
+                } else if (preset === "party") {
+                    rgbInnerColor.value = "#ff3b30";
+                    rgbMiddleColor.value = "#ffcc00";
+                    rgbOuterColor.value = "#0a84ff";
+                } else if (preset === "sleep") {
+                    rgbInnerColor.value = "#001f3f";
+                    rgbMiddleColor.value = "#001020";
+                    rgbOuterColor.value = "#000000";
+                }
+                rgbInnerEnabled.checked = true;
+                rgbMiddleEnabled.checked = true;
+                rgbOuterEnabled.checked = true;
+                updateRgbPreview();
+            });
+        });
+
+        btnSaveRgb.addEventListener("click", () => {
+            const data = {
+                innerEnabled: rgbInnerEnabled.checked,
+                middleEnabled: rgbMiddleEnabled.checked,
+                outerEnabled: rgbOuterEnabled.checked,
+                innerColor: rgbInnerColor.value,
+                middleColor: rgbMiddleColor.value,
+                outerColor: rgbOuterColor.value
+            };
+            localStorage.setItem("robo_rgb", JSON.stringify(data));
+            rgbSaveMessage.style.display = "block";
+            setTimeout(() => {
+                rgbSaveMessage.style.display = "none";
+            }, 2000);
+        });
+
+        function loadRgbFromStorage() {
+            const raw = localStorage.getItem("robo_rgb");
+            if (!raw) {
+                updateRgbPreview();
+                return;
+            }
+            try {
+                const data = JSON.parse(raw);
+                rgbInnerEnabled.checked = !!data.innerEnabled;
+                rgbMiddleEnabled.checked = !!data.middleEnabled;
+                rgbOuterEnabled.checked = !!data.outerEnabled;
+                if (data.innerColor) rgbInnerColor.value = data.innerColor;
+                if (data.middleColor) rgbMiddleColor.value = data.middleColor;
+                if (data.outerColor) rgbOuterColor.value = data.outerColor;
+            } catch (e) {}
+            updateRgbPreview();
+        }
+
+        // =========================
+        // INITIAL LOAD
+        // =========================
+        window.addEventListener("load", () => {
+            const lang = localStorage.getItem("robo_language") || "de";
+            applyTranslations(lang);
+
+            startScreen.style.display = "block";
+            onboarding.style.display = "none";
+            app.style.display = "none";
+
+            showPage("home");
+            updateUIFromStorage();
+            loadRgbFromStorage();
+        });
+    </script>
+</body>
+</html>
